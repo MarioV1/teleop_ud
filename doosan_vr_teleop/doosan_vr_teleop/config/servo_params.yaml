@@ -1,0 +1,50 @@
+# servo_params.yaml
+# MoveIt Servo configuration for Doosan M1509 VR teleoperation
+# Used by doosan_vr_teleop
+
+servo_node:
+  ros__parameters:
+
+    use_gazebo: false
+
+    # Planning group — matches dsr_moveit_config_m1509/config/dsr.srdf
+    move_group_name: manipulator
+
+    # Frames
+    robot_link_command_frame: base_link
+    ee_frame_name:            link_6
+
+    # Input — vr_bridge_node publishes TwistStamped here
+    cartesian_command_in_topic: /servo_node/delta_twist_cmds
+    joint_command_in_topic:     /servo_node/delta_joint_cmds
+    command_in_type:            speed_units
+
+    # Output — dsr_moveit_controller JointTrajectoryController
+    command_out_topic: /dsr_moveit_controller/joint_trajectory
+    command_out_type:  trajectory_msgs/JointTrajectory
+    publish_joint_positions:    true
+    publish_joint_velocities:   true
+    publish_joint_accelerations: false
+
+    # Safety
+    check_collisions:                    true
+    self_collision_proximity_threshold:  0.02
+    scene_collision_proximity_threshold: 0.05
+    lower_singularity_threshold:         17.0
+    hard_stop_singularity_threshold:     30.0
+    joint_limit_margins: [0.1, 0.1, 0.1, 0.1, 0.1, 0.1]
+
+    # Smoothing — critical for Doosan hardware
+    use_smoothing: true
+    smoothing_filter_plugin_name: online_signal_smoothing::ButterworthFilterPlugin
+
+    # Velocity — start conservative, increase after confirming correct motion
+    override_velocity_scaling_factor: 0.25
+
+    # Timing — 30 Hz matches Unity VR app publish rate
+    publish_period:                    0.033
+    incoming_command_timeout:          0.2
+    num_outgoing_halt_msgs_to_publish: 4
+
+    # Status topic — read by haptic_node
+    status_topic: /servo_node/status
